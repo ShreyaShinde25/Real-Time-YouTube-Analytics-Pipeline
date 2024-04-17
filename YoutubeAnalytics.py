@@ -23,18 +23,18 @@ def fetch_page_lists(url,parameters, page_token=None):
 
 def format_response(video):
     video_res={
-   'title':video['snippet']['title'],
-   'likes':int(video['statistics'].get('likeCount',0)),
-   'comments':int(video['statistics'].get('commentCount',0)),
-   'views':int(video['statistics'].get('viewCount',0)),
-   'favorites':int(video['statistics'].get('favoriteCount',0)),
-   'thumnnail':video['snippet']['thumbnails']['default']['url']
+        'title': video['snippet']['title'],
+        'likes': int(video['statistics'].get('likeCount', 0)),
+        'comments': int(video['statistics'].get('commentCount', 0)),
+        'views': int(video['statistics'].get('viewCount', 0)),
+        'favorites': int(video['statistics'].get('favoriteCount', 0)),
+        'thumbnail': video['snippet']['thumbnails']['default']['url']
     }
     return video_res
 
 
 if __name__=="__main__":
-    logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.INFO)
     producer=KafkaProducer(bootstrap_servers=['localhost:9092'])
 
 #     response=requests.get("https://www.googleapis.com/youtube/v3/videos",
@@ -75,8 +75,9 @@ if __name__=="__main__":
              None):
             
             # logging.info("Video here => $s",pprint(format_response(video)))
-            producer.send('youtube_videos',json.dumps(video).encode('utf-8'))
-            producer.flush()
+            producer.send('youtube_videos',json.dumps(format_response(video)).encode('utf-8'),key=video_id.encode('utf-8'))
+            print('sent', video['snippet']['title'])
+            # producer.flush()
 
 
 
